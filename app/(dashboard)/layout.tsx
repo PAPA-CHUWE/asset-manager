@@ -67,7 +67,7 @@ const SidebarItem: React.FC<{ item: MenuItem; onItemClick?: () => void }> = ({ i
         )}
       </div>
 
-      {hasChildren && isExpanded && (
+      {hasChildren && isExpanded && item.children && (
         <div className="ml-4 mt-1 border-l pl-3 space-y-1">
           {item.children.map((child) => (
             <SidebarItem key={child.title} item={child} onItemClick={onItemClick} />
