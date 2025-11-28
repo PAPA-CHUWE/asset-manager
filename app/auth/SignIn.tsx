@@ -15,11 +15,18 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { User, Eye, EyeOff } from 'lucide-react'
+import { ModeToggle } from '../theme/ModeTogle'
+
+interface SignInFormValues {
+  email: string
+  password: string
+  remember: boolean
+}
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = React.useState(false)
 
-  const form = useForm({
+  const form = useForm<SignInFormValues>({
     defaultValues: {
       email: '',
       password: '',
@@ -28,19 +35,26 @@ export default function SignIn() {
   })
 
   return (
-    <div className="bg-white min-h-screen flex flex-col items-center justify-center py-6 px-4">
-      <div className="max-w-md w-full border border-gray-300 p-8 rounded-xl bg-gray-100 shadow-sm">
+    <div className="relative bg-background text-foreground min-h-screen flex flex-col items-center justify-center py-6 px-4">
+      {/* ModeToggle at top-right corner */}
+      <div className="absolute top-4 right-4">
+        <ModeToggle />
+      </div>
+
+      <div className="max-w-md w-full border border-border p-8 rounded-xl bg-card shadow-sm">
 
         {/* Profile Icon */}
         <div className="mb-6 flex items-center justify-center">
-          <div className="w-24 h-24 rounded-full bg-white shadow-md ring-2 ring-slate-300 flex items-center justify-center">
+          <div className="w-24 h-24 rounded-full bg-background shadow-md ring-2 ring-border flex items-center justify-center">
             <User size={50} className="text-slate-700" />
           </div>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(() => {})} className="space-y-6">
-
+          <form
+            onSubmit={form.handleSubmit((values) => console.log(values))}
+            className="space-y-6"
+          >
             {/* Email */}
             <FormField
               control={form.control}
@@ -93,7 +107,7 @@ export default function SignIn() {
               )}
             />
 
-            {/* Remember + Forgot */}
+            {/* Remember + Forgot Password */}
             <div className="flex items-center justify-between">
               <FormField
                 control={form.control}
