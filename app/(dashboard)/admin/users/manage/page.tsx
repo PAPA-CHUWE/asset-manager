@@ -44,7 +44,7 @@ export default function ManageUsers() {
         </h4>
 
         <div className="flex gap-2">
-          <Button onClick={() => setModalOpen(true)}>Create User</Button>
+         
           <CreateUserModal
             open={modalOpen}
             setOpen={setModalOpen}
