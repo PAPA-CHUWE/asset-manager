@@ -58,7 +58,7 @@ export default function SignIn() {
   
       // Save token & role
       const storage = values.remember ? localStorage : sessionStorage
-      storage.setItem('access_token', data.session.access_token)
+      storage.setItem('access_token', data.accessToken) // <-- use data.accessToken
       storage.setItem('role', role)
   
       // Redirect based on role
@@ -70,6 +70,7 @@ export default function SignIn() {
       setLoading(false)
     }
   }
+  
   
   
   return (
