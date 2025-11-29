@@ -1,41 +1,61 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { UserCols } from '@/app/constants/UserCols'
-import { UserData } from '@/app/constants/UserData'
-import UserTable from '@/app/ui-components/UserTable'
-import { Button } from '@/components/ui/button'
+import React, { useState } from "react";
+import { UserCols } from "@/app/constants/UserCols";
+import { UserData } from "@/app/constants/UserData";
+import UserTable from "@/app/ui-components/UserTable";
+import { Button } from "@/components/ui/button";
+import CreateUserModal from "@/app/ui-components/CreateUserModal";
+import { z } from "zod";
 
-const ManageUsers = () => {
-  // Local state to simulate loading, can replace with actual API call
-  const [loading, setLoading] = useState(false)
+const userSchema = z.object({
+  first_name: z.string(),
+  last_name: z.string(),
+  email: z.string(),
+  role: z.enum(["admin", "user"]),
+  department: z.string(),
+});
+
+export default function ManageUsers() {
+  const [users, setUsers] = useState(UserData); // dynamic user list
+  const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleCreateUser = (user: z.infer<typeof userSchema>) => {
+    setUsers([...users, user]); // add new user to list
+    console.log("User created:", user);
+  };
 
   return (
     <div className="space-y-4">
-      {/* ---------- Header ---------- */}
       <div className="flex justify-between items-center">
         <h4 className="text-lg font-semibold">
-          Manage Users ({UserData.length})
+          Manage Users ({users.length})
         </h4>
+
         <div className="flex gap-2">
-          <Button onClick={() => console.log('Create User clicked')}>Create User</Button>
-          <Button onClick={() => console.log('Bulk Upload clicked')}>Bulk Upload</Button>
+          <Button onClick={() => setModalOpen(true)}>Create User</Button>
+          <CreateUserModal
+            open={modalOpen}
+            setOpen={setModalOpen}
+            onCreate={handleCreateUser}
+          />
+          <Button onClick={() => console.log("Bulk Upload clicked")}>
+            Bulk Upload
+          </Button>
         </div>
       </div>
 
-      {/* ---------- User Table ---------- */}
       <div className="mt-2">
         <UserTable
           columns={UserCols}
-          data={UserData} // replace with fetched API data when ready
+          data={users}
           loading={loading}
-          onView={(row) => console.log('View:', row)}
-          onEdit={(row) => console.log('Edit:', row)}
-          onDelete={(row) => console.log('Delete:', row)}
+          onView={(row) => console.log("View:", row)}
+          onEdit={(row) => console.log("Edit:", row)}
+          onDelete={(row) => console.log("Delete:", row)}
         />
       </div>
     </div>
-  )
+  );
 }
-
-export default ManageUsers
