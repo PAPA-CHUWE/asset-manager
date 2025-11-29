@@ -33,16 +33,15 @@ const SidebarItem: React.FC<{
   const [isExpanded, setIsExpanded] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
 
-  // Check if current item or any of its children is active
-  const isActive = item.href === pathname || 
-    (item.children && item.children.some(child => child.href === pathname));
+  // Check if any child is active (for auto-expanding parents)
+  const hasActiveChild = item.children && item.children.some(child => child.href === pathname);
 
   // Auto-expand parent if child is active
   useEffect(() => {
-    if (hasChildren && item.children?.some(child => child.href === pathname)) {
+    if (hasActiveChild) {
       setIsExpanded(true);
     }
-  }, [pathname, hasChildren, item.children]);
+  }, [pathname, hasActiveChild]);
 
   const handleClick = () => {
     if (!hasChildren) {
@@ -52,15 +51,19 @@ const SidebarItem: React.FC<{
     }
   };
 
+  // For parent items, we don't check if they're active
+  // For leaf items, check if their href matches the pathname
+  const isActive = !hasChildren && item.href === pathname;
+
   return (
     <div className="mb-1">
       <div className="flex items-center">
         {hasChildren ? (
           <Button
-            variant={isActive ? "secondary" : "ghost"}
+            variant="ghost"
             className={cn(
               "w-full justify-start gap-2 px-4 transition-colors",
-              isActive && "bg-primary text-primary-foreground font-medium"
+              // Parent items are never highlighted as active
             )}
             onClick={handleClick}
           >
@@ -161,7 +164,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 w-64 border-r bg-card border-border p-4 flex flex-col rounded-tr-3xl h-screen rounded-b-3xl transform transition-transform duration-300 ease-in-out",
+        "fixed lg:static inset-y-0 left-0 z-50 w-72 border-r bg-card border-border p-4 flex flex-col rounded-tr-3xl h-screen rounded-b-3xl transform transition-transform duration-300 ease-in-out",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Close button for mobile */}
@@ -192,7 +195,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 border-b bg-card border-border">
+        <header className="sticky top-0 z-30 border-b bg-card border-border rounded-bl-sm shadow-md">
           <div className="flex items-center justify-between h-16 px-4 lg:px-6">
             <div className="flex items-center">
               <Button
