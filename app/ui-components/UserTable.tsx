@@ -121,7 +121,7 @@ function UserTable<T extends Record<string, unknown>>({
   // --------------------------------------------
   return (
     <TooltipProvider>
-      <div className="overflow-x-auto rounded-lg shadow-md ring-1 ring-gray-200 h-full bg-white">
+      <div className="overflow-x-auto rounded-lg shadow-md ring-1 ring-ring h-full bg-background">
         {/* Action Bar */}
         <ActionNavBar
           selectedCount={selectedRows.size}
@@ -139,7 +139,7 @@ function UserTable<T extends Record<string, unknown>>({
 
         {/* Pagination (Top) */}
         {totalPages > 1 && (
-          <div className="flex justify-between items-center px-4 py-2 border-b bg-gray-50 text-sm text-gray-600">
+          <div className="flex justify-between items-center px-4 py-2 border-b bg-background text-sm text-gray-600">
             <div>
               Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
             </div>
@@ -168,7 +168,7 @@ function UserTable<T extends Record<string, unknown>>({
 
         {/* Table */}
         <Table className="w-full border-collapse">
-          <TableHeader className="bg-gray-50">
+          <TableHeader className="bg-background">
             <TableRow>
               {/* Select All Checkbox */}
               <TableHead className="w-12 font-semibold text-gray-700">
