@@ -25,22 +25,24 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
+  DialogTrigger
 } from '@/components/ui/dialog'
 import { UserPlus } from 'lucide-react'
 
+// ------------------ ZOD SCHEMA ------------------ //
 const userSchema = z.object({
   first_name: z.string().min(2, 'First name is required'),
   last_name: z.string().min(2, 'Last name is required'),
   email: z.string().email('Enter a valid email'),
-  role: z.enum(['admin', 'user'], { required_error: 'Select a role' }),
+  role: z.enum(['admin', 'user'], { message: 'Select a role' }),
   department: z.string().min(1, 'Select a department')
 })
 
 type CreateUserModalProps = {
   open: boolean
   setOpen: (value: boolean) => void
-  onCreate: (user: z.infer<typeof userSchema>) => void // callback to parent
+  onCreate: (user: z.infer<typeof userSchema>) => void
 }
 
 export default function CreateUserModal ({
@@ -54,7 +56,7 @@ export default function CreateUserModal ({
       first_name: '',
       last_name: '',
       email: '',
-      role: '',
+      role: 'user',
       department: ''
     }
   })
@@ -67,6 +69,12 @@ export default function CreateUserModal ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <UserPlus className='w-4 h-4 mr-2' /> Create User
+        </Button>
+      </DialogTrigger>
+
       <DialogContent
         className='sm:max-w-lg'
         onInteractOutside={e => e.preventDefault()}
@@ -81,6 +89,7 @@ export default function CreateUserModal ({
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+              {/* First Name */}
               <FormField
                 control={form.control}
                 name='first_name'
@@ -95,6 +104,7 @@ export default function CreateUserModal ({
                 )}
               />
 
+              {/* Last Name */}
               <FormField
                 control={form.control}
                 name='last_name'
@@ -109,6 +119,7 @@ export default function CreateUserModal ({
                 )}
               />
 
+              {/* Email */}
               <FormField
                 control={form.control}
                 name='email'
@@ -127,13 +138,14 @@ export default function CreateUserModal ({
                 )}
               />
 
+              {/* Role */}
               <FormField
                 control={form.control}
                 name='role'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder='Select a role' />
@@ -149,13 +161,14 @@ export default function CreateUserModal ({
                 )}
               />
 
+              {/* Department */}
               <FormField
                 control={form.control}
                 name='department'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Department</FormLabel>
-                    <Select onValueChange={field.onChange}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder='Select department' />
