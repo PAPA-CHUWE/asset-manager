@@ -20,6 +20,7 @@ import {
   User
 } from 'lucide-react';
 import { ModeToggle } from '../theme/ModeTogle';
+import UserAccountModal from '../ui-components/UserAccountModal';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -238,14 +239,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Button>
 
               {/* User Profile */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="ml-2"
-                title="User profile"
-              >
-                <User className="h-5 w-5" />
-              </Button>
+              <UserAccountModal>
+  <Button
+    variant="outline"
+    size="icon"
+    className="ml-2"
+    title="User profile"
+  >
+    <User className="h-5 w-5" />
+  </Button>
+</UserAccountModal>
+
             </div>
           </div>
         </header>
