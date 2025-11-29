@@ -1,5 +1,5 @@
-import { Column } from "./UserTable"
 import { Badge } from "@/components/ui/badge"
+import { Column } from "../ui-components/UserTable"
 
 export interface Member {
   _id: string
@@ -26,14 +26,29 @@ export const UserCols: Column<Member>[] = [
   {
     key: "status",
     label: "Status",
-    render: row => (
-      <Badge
-        variant={row.status === "active" ? "default" : "secondary"}
-        className="capitalize"
-      >
-        {row.status}
-      </Badge>
-    )
+    render: row => {
+      let variant: "default" | "destructive" | "warning" = "default"
+
+      switch (row.status.toLowerCase()) {
+        case "active":
+          variant = "default" // green
+          break
+        case "pending":
+          variant = "warning" // yellow
+          break
+        case "inactive":
+          variant = "destructive" // red
+          break
+        default:
+          variant = "default"
+      }
+
+      return (
+        <Badge variant={variant} className="capitalize">
+          {row.status}
+        </Badge>
+      )
+    }
   },
   {
     key: "createdAt",
