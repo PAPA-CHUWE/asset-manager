@@ -19,7 +19,7 @@ import {
   export const AdminMenuItems: MenuItem[] = [
     {
       title: "Dashboard",
-      href: "/admin",
+      href: "/admin/home",
       icon: <Home size={20} />,
     },
     {

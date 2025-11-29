@@ -20,6 +20,7 @@ import {
   Moon,
   User
 } from 'lucide-react';
+import { ModeToggle } from '../theme/ModeTogle';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -81,22 +82,21 @@ const SidebarItem: React.FC<{ item: MenuItem; onItemClick?: () => void }> = ({ i
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [userRole, setUserRole] = useState<string>('user');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(3); // Example notification count
+  const [notifications, setNotifications] = useState(3); 
 
   // Load role from sessionStorage
   useEffect(() => {
+    // Only update state if the role in sessionStorage differs from initial
     const storedRole = sessionStorage.getItem('role');
-    setUserRole(storedRole ? storedRole.toLowerCase() : 'admin');
+    if (storedRole && storedRole.toLowerCase() !== userRole) {
+      setUserRole(storedRole.toLowerCase());
+    } else if (!storedRole && userRole !== 'admin') {
+      setUserRole('admin');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Check for system preference for dark mode
-  useEffect(() => {
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setIsDarkMode(isDark);
-  }, []);
-
-  // Determine menu
+ 
   const menuItems =
     userRole === 'admin'
       ? AdminMenuItems
@@ -109,12 +109,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   };
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    // You can integrate with your theme provider here
-    document.documentElement.classList.toggle('dark');
-  };
-
   const handleNotifications = () => {
     // Handle notification click - could open a dropdown or mark as read
     setNotifications(0);
@@ -123,20 +117,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className={cn(
-      "flex min-h-screen bg-background text-foreground transition-colors",
-      isDarkMode ? "dark" : ""
+      "flex min-h-screen bg-background text-foreground transition-colors gap-3"
     )}>
       {/* Mobile sidebar backdrop */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0  z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 w-64 border-r border-border bg-card p-4 flex flex-col rounded-tr-lg rounded-br-lg transform transition-transform duration-300 ease-in-out",
+        "fixed lg:static inset-y-0 left-0 z-50 w-64 border-r  border-border p-4 flex flex-col rounded-tr-lg rounded-br-lg transform transition-transform duration-300 ease-in-out",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Close button for mobile */}
@@ -165,45 +158,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </ScrollArea>
       </aside>
 
-      {/* Main content area */}
+
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
-        <header className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+        <header className="sticky top-0 z-30   border-b border-border">
           <div className="flex items-center justify-between h-16 px-4 lg:px-6">
-            {/* Left side - Mobile menu button */}
+
             <div className="flex items-center">
               <Button
-                variant="ghost"
+                 variant="outline"
                 size="icon"
                 className="lg:hidden mr-2"
                 onClick={() => setIsSidebarOpen(true)}
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <div className="hidden lg:block">
-                <h1 className="text-lg font-semibold">
-                  Welcome back, {userRole === 'admin' ? 'Admin' : 'User'}
-                </h1>
-              </div>
+             
             </div>
 
             {/* Right side - Icons */}
             <div className="flex items-center gap-2">
-              {/* Theme Toggle */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                className="relative"
-                title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-              >
-                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </Button>
+             <ModeToggle/>
 
               {/* Notifications */}
               <Button
-                variant="ghost"
+                 variant="outline"
                 size="icon"
                 onClick={handleNotifications}
                 className="relative"
@@ -219,7 +197,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
               {/* Settings */}
               <Button
-                variant="ghost"
+                 variant="outline"
                 size="icon"
                 title="Settings"
               >
@@ -228,7 +206,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
               {/* User Profile */}
               <Button
-                variant="ghost"
+                 variant="outline"
                 size="icon"
                 className="ml-2"
                 title="User profile"
@@ -241,7 +219,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         {/* Main content */}
         <main className="flex-1 p-4 lg:p-6">
-          <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
+          <div className="bg-transparent rounded-lg border border-border p-4 lg:p-6 ring ring-ring">
             {children}
           </div>
         </main>
