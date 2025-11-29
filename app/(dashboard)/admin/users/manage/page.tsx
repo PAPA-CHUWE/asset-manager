@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { UserCols } from "@/app/constants/UserCols";
+import { Member, UserCols } from "@/app/constants/UserCols";
 import { UserData } from "@/app/constants/UserData";
 import UserTable from "@/app/ui-components/UserTable";
 import { Button } from "@/components/ui/button";
@@ -22,9 +22,19 @@ export default function ManageUsers() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleCreateUser = (user: z.infer<typeof userSchema>) => {
-    setUsers([...users, user]); // add new user to list
-    console.log("User created:", user);
-  };
+    const newUser: Member = {
+      _id: crypto.randomUUID(), // generate unique id for frontend
+      fullName: `${user.first_name} ${user.last_name}`,
+      email: user.email,
+      phone: "-", // default empty or placeholder
+      status: "active", // default status
+      createdAt: new Date().toISOString(),
+    }
+  
+    setUsers([...users, newUser]) // now compatible with UserCols
+    console.log("User created:", newUser)
+  }
+  
 
   return (
     <div className="space-y-4">
