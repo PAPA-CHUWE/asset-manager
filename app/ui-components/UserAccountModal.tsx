@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useState } from 'react'
 import {
   Popover,
   PopoverTrigger,
@@ -8,7 +8,9 @@ import {
 } from '@/components/ui/popover'
 import { User, KeyRound, LogOut } from 'lucide-react'
 
-// ---------- Type Definitions ----------
+import LogoutModal from './LogoutModal'
+
+// ---------- Types ----------
 interface UserAccountPopoverProps {
   children: ReactNode
 }
@@ -20,7 +22,7 @@ interface MenuItemProps {
   onClick?: () => void
 }
 
-// ---------- MenuItem Component ----------
+// ---------- Menu Item component ----------
 function MenuItem({ icon, label, danger = false, onClick }: MenuItemProps) {
   return (
     <button
@@ -35,55 +37,50 @@ function MenuItem({ icon, label, danger = false, onClick }: MenuItemProps) {
   )
 }
 
-// ---------- Main Component ----------
+// ---------- Main popover component ----------
 export default function UserAccountPopover({ children }: UserAccountPopoverProps) {
-  // Example handler functions - you can customize these
-  const handleProfile = () => {
-    console.log('Profile clicked')
-    // Add your profile navigation logic here
-  }
+  const [openPopover, setOpenPopover] = useState(false)
+  const [logoutOpen, setLogoutOpen] = useState(false)
 
-  const handleChangePassword = () => {
-    console.log('Change Password clicked')
-    // Add your change password logic here
-  }
-
-  const handleLogout = () => {
-    console.log('Logout clicked')
-    // Add your logout logic here
-    // Example: 
-    // sessionStorage.removeItem('token')
-    // sessionStorage.removeItem('role')
-    // window.location.href = '/login'
+  const handleLogoutClick = () => {
+    setOpenPopover(false)       // close the popover
+    setLogoutOpen(true)         // open the logout modal
   }
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
+    <>
+      <Popover open={openPopover} onOpenChange={setOpenPopover}>
+        <PopoverTrigger asChild>{children}</PopoverTrigger>
 
-      <PopoverContent className='w-56 p-2' align="end">
-        <div className='flex flex-col'>
-          <MenuItem 
-            icon={<User size={16} />} 
-            label='Profile' 
-            onClick={handleProfile}
-          />
-          <MenuItem 
-            icon={<KeyRound size={16} />} 
-            label='Change Password' 
-            onClick={handleChangePassword}
-          />
+        <PopoverContent className='w-56 p-2' align="end">
+          <div className='flex flex-col'>
+            <MenuItem 
+              icon={<User size={16} />} 
+              label='Profile'
+            />
 
-          <div className='border-t my-2' />
+            <MenuItem 
+              icon={<KeyRound size={16} />} 
+              label='Change Password'
+            />
 
-          <MenuItem 
-            icon={<LogOut size={16} />} 
-            label='Logout' 
-            danger 
-            onClick={handleLogout}
-          />
-        </div>
-      </PopoverContent>
-    </Popover>
+            <div className='border-t my-2' />
+
+            <MenuItem 
+              icon={<LogOut size={16} />} 
+              label='Logout' 
+              danger 
+              onClick={handleLogoutClick}
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal 
+        open={logoutOpen} 
+        onOpenChange={setLogoutOpen}
+      />
+    </>
   )
 }
