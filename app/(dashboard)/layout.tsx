@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { MenuItem, UserMenuItems } from '../constants/UserMenuItems';
 import { AdminMenuItems } from '../constants/AdminMenuItems';
@@ -16,8 +17,6 @@ import {
   X, 
   Bell, 
   Settings, 
-  Sun, 
-  Moon,
   User
 } from 'lucide-react';
 import { ModeToggle } from '../theme/ModeTogle';
@@ -26,13 +25,30 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-const SidebarItem: React.FC<{ item: MenuItem; onItemClick?: () => void }> = ({ item, onItemClick }) => {
+const SidebarItem: React.FC<{ 
+  item: MenuItem; 
+  onItemClick?: () => void;
+  pathname: string;
+}> = ({ item, onItemClick, pathname }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
+
+  // Check if current item or any of its children is active
+  const isActive = item.href === pathname || 
+    (item.children && item.children.some(child => child.href === pathname));
+
+  // Auto-expand parent if child is active
+  useEffect(() => {
+    if (hasChildren && item.children?.some(child => child.href === pathname)) {
+      setIsExpanded(true);
+    }
+  }, [pathname, hasChildren, item.children]);
 
   const handleClick = () => {
     if (!hasChildren) {
       onItemClick?.(); // Close sidebar on mobile when a leaf item is clicked
+    } else {
+      setIsExpanded(!isExpanded);
     }
   };
 
@@ -41,9 +57,12 @@ const SidebarItem: React.FC<{ item: MenuItem; onItemClick?: () => void }> = ({ i
       <div className="flex items-center">
         {hasChildren ? (
           <Button
-            variant="ghost"
-            className="w-full justify-start gap-2 px-4"
-            onClick={() => setIsExpanded(!isExpanded)}
+            variant={isActive ? "secondary" : "ghost"}
+            className={cn(
+              "w-full justify-start gap-2 px-4 transition-colors",
+              isActive && "bg-primary text-primary-foreground font-medium"
+            )}
+            onClick={handleClick}
           >
             {item.icon}
             <span className="flex-1 text-left">{item.title}</span>
@@ -55,8 +74,11 @@ const SidebarItem: React.FC<{ item: MenuItem; onItemClick?: () => void }> = ({ i
           </Button>
         ) : (
           <Button
-            variant="ghost"
-            className="w-full justify-start gap-2 px-4"
+            variant={isActive ? "secondary" : "ghost"}
+            className={cn(
+              "w-full justify-start gap-2 px-4 transition-colors",
+              isActive && "bg-primary text-primary-foreground font-medium"
+            )}
             asChild
             onClick={handleClick}
           >
@@ -69,10 +91,27 @@ const SidebarItem: React.FC<{ item: MenuItem; onItemClick?: () => void }> = ({ i
       </div>
 
       {hasChildren && isExpanded && item.children && (
-        <div className="ml-4 mt-1 border-l pl-3 space-y-1">
-          {item.children.map((child) => (
-            <SidebarItem key={child.title} item={child} onItemClick={onItemClick} />
-          ))}
+        <div className="ml-4 mt-1 border-l-2 border-border pl-3 space-y-1">
+          {item.children.map((child) => {
+            const isChildActive = child.href === pathname;
+            return (
+              <Button
+                key={child.title}
+                variant={isChildActive ? "secondary" : "ghost"}
+                className={cn(
+                  "w-full justify-start gap-2 px-3 transition-colors",
+                  isChildActive && "bg-primary text-primary-foreground font-medium"
+                )}
+                asChild
+                onClick={onItemClick}
+              >
+                <Link href={child.href || '#'}>
+                  {child.icon}
+                  <span className="text-sm">{child.title}</span>
+                </Link>
+              </Button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -83,36 +122,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [userRole, setUserRole] = useState<string>('user');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState(3); 
+  const pathname = usePathname();
 
   // Load role from sessionStorage
   useEffect(() => {
-    // Only update state if the role in sessionStorage differs from initial
     const storedRole = sessionStorage.getItem('role');
     if (storedRole && storedRole.toLowerCase() !== userRole) {
       setUserRole(storedRole.toLowerCase());
     } else if (!storedRole && userRole !== 'admin') {
       setUserRole('admin');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userRole]);
 
- 
-  const menuItems =
-    userRole === 'admin'
-      ? AdminMenuItems
-      : UserMenuItems;
+  const menuItems = userRole === 'admin' ? AdminMenuItems : UserMenuItems;
 
   // Close sidebar when clicking on a link (for mobile)
   const handleSidebarItemClick = () => {
-    if (window.innerWidth < 1024) { // lg breakpoint
+    if (window.innerWidth < 1024) {
       setIsSidebarOpen(false);
     }
   };
 
   const handleNotifications = () => {
-    // Handle notification click - could open a dropdown or mark as read
     setNotifications(0);
-    // Add your notification logic here
   };
 
   return (
@@ -122,19 +154,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Mobile sidebar backdrop */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0  z-40 lg:hidden"
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 w-64 border-r  border-border p-4 flex flex-col rounded-tr-3xl h-screen rounded-b-3xl transform transition-transform duration-300 ease-in-out",
+        "fixed lg:static inset-y-0 left-0 z-50 w-64 border-r bg-card border-border p-4 flex flex-col rounded-tr-3xl h-screen rounded-b-3xl transform transition-transform duration-300 ease-in-out",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Close button for mobile */}
         <div className="flex items-center justify-between mb-6 lg:justify-start">
-          <h2 className="text-xl font-bold">Asset Manager</h2>
+          <h2 className="text-xl font-bold text-card-foreground">Asset Manager</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -152,37 +184,35 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 key={item.title} 
                 item={item} 
                 onItemClick={handleSidebarItemClick}
+                pathname={pathname}
               />
             ))}
           </nav>
         </ScrollArea>
       </aside>
 
-
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 border-b border-border">
+        <header className="sticky top-0 z-30 border-b bg-card border-border">
           <div className="flex items-center justify-between h-16 px-4 lg:px-6">
-
             <div className="flex items-center">
               <Button
-                 variant="outline"
-                size="icon-lg"
+                variant="outline"
+                size="icon"
                 className="lg:hidden mr-2"
                 onClick={() => setIsSidebarOpen(true)}
               >
                 <Menu className="h-5 w-5" />
               </Button>
-             
             </div>
 
             {/* Right side - Icons */}
             <div className="flex items-center gap-2">
-             <ModeToggle/>
+              <ModeToggle/>
 
               {/* Notifications */}
               <Button
-                 variant="outline"
-                size="icon-lg"
+                variant="outline"
+                size="icon"
                 onClick={handleNotifications}
                 className="relative"
                 title="Notifications"
@@ -197,8 +227,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
               {/* Settings */}
               <Button
-                 variant="outline"
-                size="icon-lg"
+                variant="outline"
+                size="icon"
                 title="Settings"
               >
                 <Settings className="h-5 w-5" />
@@ -206,8 +236,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
               {/* User Profile */}
               <Button
-                 variant="outline"
-                size="icon-lg"
+                variant="outline"
+                size="icon"
                 className="ml-2"
                 title="User profile"
               >
@@ -219,7 +249,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         {/* Main content */}
         <main className="flex-1 p-4 lg:p-6">
-          <div className="bg-transparent rounded-lg border border-border p-4 lg:p-6 ring ring-ring">
+          <div className="bg-transparent rounded-lg border border-border p-4 lg:p-6">
             {children}
           </div>
         </main>

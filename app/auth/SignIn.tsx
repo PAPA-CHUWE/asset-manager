@@ -10,7 +10,6 @@ import {
   FormMessage,
   FormControl
 } from '@/components/ui/form'
-
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -25,6 +24,8 @@ interface SignInFormValues {
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
 
   const form = useForm<SignInFormValues>({
     defaultValues: {
@@ -34,16 +35,50 @@ export default function SignIn() {
     }
   })
 
+  const handleLogin = async (values: SignInFormValues) => {
+    setLoading(true)
+    setErrorMessage(null)
+  
+    try {
+      const res = await fetch(
+        'https://asset-manager-backend-xlkf.onrender.com/admin/auth/login',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: values.email, password: values.password })
+        }
+      )
+  
+      const data = await res.json()
+  
+      if (!res.ok) throw new Error(data.message || 'Login failed')
+  
+      // Determine role directly from response
+      const role = data.user.role || 'user'
+  
+      // Save token & role
+      const storage = values.remember ? localStorage : sessionStorage
+      storage.setItem('access_token', data.session.access_token)
+      storage.setItem('role', role)
+  
+      // Redirect based on role
+      window.location.href = role === 'admin' ? '/admin/home' : '/user/dashboard'
+    } catch (error: any) {
+      console.error('Login error:', error)
+      setErrorMessage(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  
   return (
     <div className="relative bg-background text-foreground min-h-screen flex flex-col items-center justify-center py-6 px-4">
-      {/* ModeToggle at top-right corner */}
       <div className="absolute top-4 right-4">
         <ModeToggle />
       </div>
 
       <div className="max-w-md w-full border border-border p-8 rounded-xl bg-card shadow-sm">
-
-        {/* Profile Icon */}
         <div className="mb-6 flex items-center justify-center">
           <div className="w-24 h-24 rounded-full bg-background shadow-md ring-2 ring-border flex items-center justify-center">
             <User size={50} className="text-slate-700" />
@@ -52,10 +87,9 @@ export default function SignIn() {
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((values) => console.log(values))}
+            onSubmit={form.handleSubmit(handleLogin)}
             className="space-y-6"
           >
-            {/* Email */}
             <FormField
               control={form.control}
               name="email"
@@ -75,7 +109,6 @@ export default function SignIn() {
               )}
             />
 
-            {/* Password */}
             <FormField
               control={form.control}
               name="password"
@@ -107,7 +140,6 @@ export default function SignIn() {
               )}
             />
 
-            {/* Remember + Forgot Password */}
             <div className="flex items-center justify-between">
               <FormField
                 control={form.control}
@@ -136,12 +168,16 @@ export default function SignIn() {
               </Button>
             </div>
 
-            {/* Submit */}
+            {errorMessage && (
+              <p className="text-red-500 text-sm text-center">{errorMessage}</p>
+            )}
+
             <Button
               type="submit"
               className="w-full bg-[#1E2772] hover:bg-[#1e4272] text-white text-[15px] py-3"
+              disabled={loading}
             >
-              Sign In
+              {loading ? 'Signing in...' : 'Sign In'}
             </Button>
 
             <p className="text-sm mt-4 text-center text-slate-600">

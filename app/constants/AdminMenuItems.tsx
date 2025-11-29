@@ -26,11 +26,7 @@ import {
       title: "Users",
       icon: <Users size={20} />,
       children: [
-        // {
-        //   title: "Create User",
-        //   href: "/admin/users/create",
-        //   icon: <Users size={18} />,
-        // },
+   
         {
           title: "Manage Users",
           href: "/admin/users/manage",
@@ -44,12 +40,12 @@ import {
       children: [
         {
           title: "Create Asset Category",
-          href: "/admin/assets/categories/create",
+          href: "/admin/assets/categories",
           icon: <Layers size={18} />,
         },
         {
-          title: "View All Assets",
-          href: "/admin/assets",
+          title: "Manage Assets",
+          href: "/admin/assets/manage-assets",
           icon: <Archive size={18} />,
         },
         {

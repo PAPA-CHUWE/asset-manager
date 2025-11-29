@@ -23,11 +23,7 @@ import {
       title: "Assets",
       icon: <FolderPlus size={20} />,
       children: [
-        {
-          title: "Create Asset",
-          href: "/user/assets/create",
-          icon: <FolderPlus size={18} />,
-        },
+        
         {
           title: "My Assets",
           href: "/user/assets",
