@@ -26,11 +26,11 @@ import {
       title: "Users",
       icon: <Users size={20} />,
       children: [
-        {
-          title: "Create User",
-          href: "/admin/users/create",
-          icon: <Users size={18} />,
-        },
+        // {
+        //   title: "Create User",
+        //   href: "/admin/users/create",
+        //   icon: <Users size={18} />,
+        // },
         {
           title: "Manage Users",
           href: "/admin/users/manage",

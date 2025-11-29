@@ -129,7 +129,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 w-64 border-r  border-border p-4 flex flex-col rounded-tr-lg rounded-br-lg transform transition-transform duration-300 ease-in-out",
+        "fixed lg:static inset-y-0 left-0 z-50 w-64 border-r  border-border p-4 flex flex-col rounded-tr-3xl h-screen rounded-b-3xl transform transition-transform duration-300 ease-in-out",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Close button for mobile */}
@@ -160,13 +160,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30   border-b border-border">
+        <header className="sticky top-0 z-30 border-b border-border">
           <div className="flex items-center justify-between h-16 px-4 lg:px-6">
 
             <div className="flex items-center">
               <Button
                  variant="outline"
-                size="icon"
+                size="icon-lg"
                 className="lg:hidden mr-2"
                 onClick={() => setIsSidebarOpen(true)}
               >
@@ -182,7 +182,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {/* Notifications */}
               <Button
                  variant="outline"
-                size="icon"
+                size="icon-lg"
                 onClick={handleNotifications}
                 className="relative"
                 title="Notifications"
@@ -198,7 +198,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {/* Settings */}
               <Button
                  variant="outline"
-                size="icon"
+                size="icon-lg"
                 title="Settings"
               >
                 <Settings className="h-5 w-5" />
@@ -207,7 +207,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {/* User Profile */}
               <Button
                  variant="outline"
-                size="icon"
+                size="icon-lg"
                 className="ml-2"
                 title="User profile"
               >
