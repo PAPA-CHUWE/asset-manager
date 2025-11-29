@@ -1,3 +1,4 @@
+// ./app/constants/UserCols.tsx
 import { Badge } from "@/components/ui/badge"
 import { Column } from "../ui-components/UserTable"
 
@@ -13,20 +14,21 @@ export interface Member {
 export const UserCols: Column<Member>[] = [
   {
     key: "fullName",
-    label: "Full Name"
+    label: "Full Name",
   },
   {
     key: "email",
-    label: "Email"
+    label: "Email",
   },
   {
     key: "phone",
-    label: "Phone Number"
+    label: "Phone Number",
   },
   {
     key: "status",
     label: "Status",
-    render: row => {
+    render: (row) => {
+      // Explicitly type variant to match Badge props
       let variant: "default" | "destructive" | "secondary" = "default"
 
       switch (row.status.toLowerCase()) {
@@ -48,11 +50,11 @@ export const UserCols: Column<Member>[] = [
           {row.status}
         </Badge>
       )
-    }
+    },
   },
   {
     key: "createdAt",
     label: "Joined Date",
-    render: row => new Date(row.createdAt).toLocaleDateString()
-  }
+    render: (row) => new Date(row.createdAt).toLocaleDateString(),
+  },
 ]
