@@ -27,14 +27,14 @@ export const UserCols: Column<Member>[] = [
     key: "status",
     label: "Status",
     render: row => {
-      let variant: "default" | "destructive" | "warning" = "default"
+      let variant: "default" | "destructive" | "secondary" = "default"
 
       switch (row.status.toLowerCase()) {
         case "active":
           variant = "default" // green
           break
         case "pending":
-          variant = "warning" // yellow
+          variant = "secondary" // yellow-ish
           break
         case "inactive":
           variant = "destructive" // red
