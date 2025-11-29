@@ -238,8 +238,8 @@ function UserTable<T extends Record<string, unknown>>({
                 return (
                   <TableRow
                     key={globalIndex}
-                    className={`hover:bg-gray-100 transition-colors ${
-                      selected ? "bg-blue-50 hover:bg-blue-100" : ""
+                    className={`dark:hover:bg-gray-900 hover:bg-gray-200 transition-colors   ${
+                      selected ? "bg-blue-50 hover:bg-blue-100 " : ""
                     }`}
                   >
                     {/* Row Checkbox */}
@@ -270,7 +270,7 @@ function UserTable<T extends Record<string, unknown>>({
                     {columns.map((col) => (
                       <TableCell
                         key={String(col.key)}
-                        className="text-sm text-gray-800"
+                        className="text-sm text-accent-foreground"
                       >
                         {col.render ? col.render(row) : String(row[col.key])}
                       </TableCell>
