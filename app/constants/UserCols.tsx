@@ -1,9 +1,9 @@
 // ./app/constants/UserCols.tsx
-import { Badge } from "@/components/ui/badge"
-import { Column } from "../ui-components/UserTable"
+import { Badge } from '@/components/ui/badge'
+import { Column } from '../ui-components/UserTable'
 
 export interface Member {
-  _id: string
+  id: string
   fullName: string
   email: string
   phone: string
@@ -13,48 +13,48 @@ export interface Member {
 
 export const UserCols: Column<Member>[] = [
   {
-    key: "fullName",
-    label: "Full Name",
+    key: 'fullName',
+    label: 'Full Name'
   },
   {
-    key: "email",
-    label: "Email",
+    key: 'email',
+    label: 'Email'
   },
   {
-    key: "phone",
-    label: "Phone Number",
+    key: 'phone',
+    label: 'Phone Number'
   },
   {
-    key: "status",
-    label: "Status",
-    render: (row) => {
+    key: 'status',
+    label: 'Status',
+    render: row => {
       // Explicitly type variant to match Badge props
-      let variant: "default" | "destructive" | "secondary" = "default"
+      let variant: 'default' | 'destructive' | 'secondary' = 'default'
 
       switch (row.status.toLowerCase()) {
-        case "active":
-          variant = "default" // green
+        case 'active':
+          variant = 'default' // green
           break
-        case "pending":
-          variant = "secondary" // yellow-ish
+        case 'pending':
+          variant = 'secondary' // yellow-ish
           break
-        case "inactive":
-          variant = "destructive" // red
+        case 'inactive':
+          variant = 'destructive' // red
           break
         default:
-          variant = "default"
+          variant = 'default'
       }
 
       return (
-        <Badge variant={variant} className="capitalize">
+        <Badge variant={variant} className='capitalize'>
           {row.status}
         </Badge>
       )
-    },
+    }
   },
   {
-    key: "createdAt",
-    label: "Joined Date",
-    render: (row) => new Date(row.createdAt).toLocaleDateString(),
-  },
+    key: 'createdAt',
+    label: 'Joined Date',
+    render: row => new Date(row.createdAt).toLocaleDateString()
+  }
 ]
