@@ -46,7 +46,7 @@ export default function ManageUsers() {
             _id: u.id,
             fullName: `${u.first_name} ${u.last_name}`,
             email: u.email,
-            phone: "-", // placeholder
+            phone: u.phone??"--", // placeholder
             status: "active",
             createdAt: u.created_at,
           }));

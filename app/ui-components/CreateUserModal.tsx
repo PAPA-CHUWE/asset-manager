@@ -35,14 +35,16 @@ const userSchema = z.object({
   first_name: z.string().min(2, 'First name is required'),
   last_name: z.string().min(2, 'Last name is required'),
   email: z.string().email('Enter a valid email'),
+  phone: z.string().min(5, 'Phone is required'),
   role: z.enum(['admin', 'user'], { message: 'Select a role' }),
-  department: z.string().min(1, 'Select a department')
+  department: z.string().min(1, 'Select a department'),
+  password: z.string().min(6, 'Password must be at least 6 characters')
 })
 
 type CreateUserModalProps = {
   open: boolean
   setOpen: (value: boolean) => void
-  onCreate: (user: z.infer<typeof userSchema>) => void
+  onCreate: (user: any) => void
 }
 
 export default function CreateUserModal ({
@@ -56,15 +58,41 @@ export default function CreateUserModal ({
       first_name: '',
       last_name: '',
       email: '',
+      phone: '',
       role: 'user',
-      department: ''
+      department: '',
+      password: ''
     }
   })
 
-  const onSubmit = (data: z.infer<typeof userSchema>) => {
-    onCreate(data) // pass new user to parent
-    setOpen(false) // close modal
-    form.reset() // reset form
+  const onSubmit = async (data: z.infer<typeof userSchema>) => {
+    try {
+      const token = sessionStorage.getItem('access_token')
+      if (!token) throw new Error('No access token found')
+
+      const res = await fetch(
+        'https://asset-manager-backend-xlkf.onrender.com/admin/users/create',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        }
+      )
+
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.message || 'Failed to create user')
+
+      onCreate({ ...data, id: result.userId })
+      setOpen(false)
+      form.reset()
+      console.log('User created successfully:', result)
+    } catch (error: any) {
+      console.error('Error creating user:', error)
+      alert(error.message)
+    }
   }
 
   return (
@@ -88,7 +116,10 @@ export default function CreateUserModal ({
 
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className='space-y-4'
+            >
               {/* First Name */}
               <FormField
                 control={form.control}
@@ -138,53 +169,92 @@ export default function CreateUserModal ({
                 )}
               />
 
-              {/* Role */}
+              {/* Phone */}
               <FormField
                 control={form.control}
-                name='role'
+                name='phone'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select a role' />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value='admin'>Admin</SelectItem>
-                        <SelectItem value='user'>User</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='text'
+                        placeholder='Enter phone number'
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Department */}
+              {/* Password */}
               <FormField
                 control={form.control}
-                name='department'
+                name='password'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select department' />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value='IT'>IT</SelectItem>
-                        <SelectItem value='Finance'>Finance</SelectItem>
-                        <SelectItem value='HR'>HR</SelectItem>
-                        <SelectItem value='Procurement'>Procurement</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='password'
+                        placeholder='Enter password'
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {/* Role & Department in flex */}
+              <div className='flex gap-4'>
+                <FormField
+                  control={form.control}
+                  name='role'
+                  render={({ field }) => (
+                    <FormItem className='flex-1'>
+                      <FormLabel>Role</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select a role' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value='admin'>Admin</SelectItem>
+                          <SelectItem value='user'>User</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='department'
+                  render={({ field }) => (
+                    <FormItem className='flex-1'>
+                      <FormLabel>Department</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select department' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value='IT'>IT</SelectItem>
+                          <SelectItem value='Finance'>Finance</SelectItem>
+                          <SelectItem value='HR'>HR</SelectItem>
+                          <SelectItem value='Procurement'>Procurement</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <Button type='submit' className='w-full mt-2'>
                 Create User
