@@ -67,7 +67,8 @@ export default function CreateUserModal({ open, setOpen, onSuccess }: Props) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent  onInteractOutside={e => e.preventDefault()}
+        onEscapeKeyDown={e => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
         </DialogHeader>

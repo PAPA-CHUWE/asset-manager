@@ -39,9 +39,9 @@ import {
       icon: <FolderPlus size={20} />,
       children: [
         {
-          title: "Create Asset Category",
+          title: "Manage Category",
           href: "/admin/assets/categories",
-          icon: <Layers size={18} />,
+          icon: <FolderPlus size={18} />,
         },
         {
           title: "Manage Assets",
