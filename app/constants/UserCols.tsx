@@ -7,6 +7,8 @@ export interface Member {
   fullName: string
   email: string
   phone: string
+  role?: string
+  department?: string
   status: string
   createdAt: string
 }

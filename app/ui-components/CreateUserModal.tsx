@@ -1,233 +1,152 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
-import { CardContent } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import { UserPlus } from 'lucide-react'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select";
+import { CardContent } from "@/components/ui/card";
+import { UserPlus } from "lucide-react";
+import { UserFormData, userSchema } from "../utils/schema";
 
+type Props = {
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  onSuccess: (user: any) => void;
+};
 
-const userSchema = z.object({
-  first_name: z.string().min(2, 'First name is required'),
-  last_name: z.string().min(2, 'Last name is required'),
-  email: z.string().email('Enter a valid email'),
-  phone: z.string().min(5, 'Phone is required'),
-  role: z.enum(['admin', 'user'], { message: 'Select a role' }),
-  department: z.string().min(1, 'Select a department'),
-  password: z.string().min(6, 'Password must be at least 6 characters')
-})
+export default function CreateUserModal({ open, setOpen, onSuccess }: Props) {
 
-type UserModalProps = {
-  open: boolean
-  setOpen: (value: boolean) => void
-  onSuccess: (user: any) => void
-  userToEdit?: any // optional: if provided, we are updating
-}
-
-export default function CreateUserModal({ open, setOpen, onSuccess, userToEdit }: UserModalProps) {
-  const form = useForm<z.infer<typeof userSchema>>({
+  const form = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
-    defaultValues: userToEdit || {
-      first_name: '',
-      last_name: '',
-      email: '',
-      phone: '',
-      role: 'user',
-      department: '',
-      password: ''
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone: "",
+      role: "user",
+      department: "",
+      password: ""
     }
-  })
+  });
 
-  useEffect(() => {
-    if (userToEdit) {
-      form.reset({
-        ...userToEdit,
-        password: '' // clear password on edit
-      })
-    } else {
-      form.reset({
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        role: 'user',
-        department: '',
-        password: ''
-      })
-    }
-  }, [userToEdit, form])
-
-  const onSubmit = async (data: z.infer<typeof userSchema>) => {
+  const onSubmit = async (data: UserFormData) => {
     try {
-      const token = sessionStorage.getItem('access_token')
-      if (!token) throw new Error('No access token found')
+      const token = sessionStorage.getItem("access_token");
+      const res = await fetch(
+        "https://asset-manager-backend-xlkf.onrender.com/admin/users/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        }
+      );
 
-        const endpoint = userToEdit?.id
-      ? `https://asset-manager-backend-xlkf.onrender.com/admin/users/update/${userToEdit.id}`
-      : 'https://asset-manager-backend-xlkf.onrender.com/admin/users/create'
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message);
 
-      const method = userToEdit ? 'PUT' : 'POST'
+      onSuccess({ ...data, id: result.userId });
+      setOpen(false);
+      form.reset();
 
-      const res = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
-      })
-
-      const result = await res.json()
-      if (!res.ok) throw new Error(result.message || 'Operation failed')
-
-      onSuccess({ ...data, _id: userToEdit?._id || result.userId })
-      setOpen(false)
-      form.reset()
-      console.log('Operation successful:', result)
-    } catch (error: any) {
-      console.error('Error:', error)
-      alert(error.message)
+    } catch (err: any) {
+      alert(err.message);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {!userToEdit && (
-        <DialogTrigger asChild>
-          <Button>
-            <UserPlus className='w-4 h-4 mr-2' /> Create User
-          </Button>
-        </DialogTrigger>
-      )}
+      <DialogTrigger asChild>
+        <Button>
+          <UserPlus className="w-4 h-4 mr-2" /> Create User
+        </Button>
+      </DialogTrigger>
 
-      <DialogContent
-        className='sm:max-w-lg'
-        onInteractOutside={e => e.preventDefault()}
-        onEscapeKeyDown={e => e.preventDefault()}
-      >
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className='flex items-center gap-2 text-xl font-semibold'>
-            <UserPlus size={20} /> {userToEdit ? 'Edit User' : 'Create New User'}
-          </DialogTitle>
+          <DialogTitle>Create New User</DialogTitle>
         </DialogHeader>
 
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              
               {/* First Name */}
-              <FormField control={form.control} name='first_name' render={({ field }) => (
+              <FormField name="first_name" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>First Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Enter first name' {...field} />
-                  </FormControl>
+                  <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
 
               {/* Last Name */}
-              <FormField control={form.control} name='last_name' render={({ field }) => (
+              <FormField name="last_name" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Enter last name' {...field} />
-                  </FormControl>
+                  <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
 
               {/* Email */}
-              <FormField control={form.control} name='email' render={({ field }) => (
+              <FormField name="email" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type='email' placeholder='Enter email' {...field} />
-                  </FormControl>
+                  <FormControl><Input type="email" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
 
               {/* Phone */}
-              <FormField control={form.control} name='phone' render={({ field }) => (
+              <FormField name="phone" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input type='text' placeholder='Enter phone' {...field} />
-                  </FormControl>
+                  <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
 
               {/* Password */}
-              <FormField control={form.control} name='password' render={({ field }) => (
+              <FormField name="password" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type='password' placeholder='Enter password' {...field} />
-                  </FormControl>
+                  <FormControl><Input type="password" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
 
               {/* Role & Department */}
-              <div className='flex gap-4'>
-                <FormField control={form.control} name='role' render={({ field }) => (
-                  <FormItem className='flex-1'>
+              <div className="flex gap-4">
+                <FormField name="role" control={form.control} render={({ field }) => (
+                  <FormItem className="flex-1">
                     <FormLabel>Role</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select a role' />
-                        </SelectTrigger>
-                      </FormControl>
+                      <SelectTrigger><SelectValue placeholder="Role" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value='admin'>Admin</SelectItem>
-                        <SelectItem value='user'>User</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="user">User</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )} />
 
-                <FormField control={form.control} name='department' render={({ field }) => (
-                  <FormItem className='flex-1'>
+                <FormField name="department" control={form.control} render={({ field }) => (
+                  <FormItem className="flex-1">
                     <FormLabel>Department</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select department' />
-                        </SelectTrigger>
-                      </FormControl>
+                      <SelectTrigger><SelectValue placeholder="Department" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value='IT'>IT</SelectItem>
-                        <SelectItem value='Finance'>Finance</SelectItem>
-                        <SelectItem value='HR'>HR</SelectItem>
-                        <SelectItem value='Procurement'>Procurement</SelectItem>
+                        <SelectItem value="IT">IT</SelectItem>
+                        <SelectItem value="Finance">Finance</SelectItem>
+                        <SelectItem value="HR">HR</SelectItem>
+                        <SelectItem value="Procurement">Procurement</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -235,15 +154,11 @@ export default function CreateUserModal({ open, setOpen, onSuccess, userToEdit }
                 )} />
               </div>
 
-              <Button type='submit' className='w-full mt-2'>
-                {userToEdit ? 'Update User' : 'Create User'}
-              </Button>
+              <Button type="submit" className="w-full">Create User</Button>
             </form>
           </Form>
         </CardContent>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-
-
