@@ -8,15 +8,9 @@ import CreateDepartmentModal from '@/app/ui-components/CreateDepartmentModal';
 import EditDepartmentModal from '@/app/ui-components/EditDepartmentModal';
 import ViewDepartmentModal from '@/app/ui-components/ViewDepartmentModal';
 import ConfirmModal from '@/app/ui-components/ConfirmModal';
-import { DepartmentCols } from '@/app/constants/DepartmentCols';
+import { Department, DepartmentCols } from '@/app/constants/DepartmentCols';
 import UserTable from '@/app/ui-components/UserTable';
 
-interface Department {
-  id: string;
-  name: string;
-  description?: string | null;
-  created_at: string;
-}
 
 
 const Departments: React.FC = () => {
