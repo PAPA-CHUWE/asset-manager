@@ -6,17 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useForm } from 'react-hook-form'
+import { Department } from '../constants/DepartmentCols'
 
 type DepartmentFormData = {
   name: string
   description?: string
 }
 
-type Department = {
-  id: string
-  name: string
-  description?: string
-}
+
 
 type Props = {
   open: boolean

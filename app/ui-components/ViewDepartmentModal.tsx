@@ -3,12 +3,9 @@
 import React, { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Department } from '../constants/DepartmentCols'
 
-type Department = {
-  id: string
-  name: string
-  description?: string
-}
+
 
 type Props = {
   open: boolean
