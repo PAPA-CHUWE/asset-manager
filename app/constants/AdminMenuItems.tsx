@@ -48,22 +48,14 @@ import {
           href: "/admin/assets/manage-assets",
           icon: <Archive size={18} />,
         },
-        {
-          title: "Delete Assets",
-          href: "/admin/assets/delete",
-          icon: <Trash2 size={18} />,
-        },
+       
       ],
     },
     {
       title: "Departments",
       icon: <Layers size={20} />,
       children: [
-        {
-          title: "Create Department",
-          href: "/admin/departments/create",
-          icon: <FolderPlus size={18} />,
-        },
+      
         {
           title: "Manage Departments",
           href: "/admin/departments/manage",
@@ -71,11 +63,7 @@ import {
         },
       ],
     },
-    {
-      title: "Reports",
-      icon: <BarChart2 size={20} />,
-      href: "/admin/reports",
-    },
+   
     {
       title: "Settings",
       icon: <Settings size={20} />,
