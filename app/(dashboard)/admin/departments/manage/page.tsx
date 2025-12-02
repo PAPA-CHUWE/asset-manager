@@ -4,12 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Trash2 } from 'lucide-react';
-import DepartmentTable from '@/app/ui-components/DepartmentTable';
 import CreateDepartmentModal from '@/app/ui-components/CreateDepartmentModal';
 import EditDepartmentModal from '@/app/ui-components/EditDepartmentModal';
 import ViewDepartmentModal from '@/app/ui-components/ViewDepartmentModal';
 import ConfirmModal from '@/app/ui-components/ConfirmModal';
 import { DepartmentCols } from '@/app/constants/DepartmentCols';
+import UserTable from '@/app/ui-components/UserTable';
 
 interface Department {
   id: string;
@@ -99,7 +99,7 @@ const Departments: React.FC = () => {
       </CardHeader>
 
       <CardContent>
-        <DepartmentTable
+        <UserTable
           data={departments}
           columns={DepartmentCols}
           loading={loading}
