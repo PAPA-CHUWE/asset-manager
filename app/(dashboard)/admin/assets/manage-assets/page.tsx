@@ -123,7 +123,7 @@ export default function ManageAssets() {
       />
 
       <UserTable
-        columns={AssetCols}
+        columns={AssetCols(assets)}
         data={assets}
         loading={loading}
         onEdit={(row: Asset) => {

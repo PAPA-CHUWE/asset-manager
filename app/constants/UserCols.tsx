@@ -24,28 +24,20 @@ export const UserCols: Column<Member>[] = [
   },
   {
     key: 'phone',
-    label: 'Phone Number'
+    label: 'Phone Number',
+    render: row => row.phone || '--'
   },
   {
     key: 'status',
     label: 'Status',
     render: row => {
-      // Explicitly type variant to match Badge props
-      let variant: 'default' | 'destructive' | 'secondary' = 'default'
-
-      switch (row.status.toLowerCase()) {
-        case 'active':
-          variant = 'default' // green
-          break
-        case 'pending':
-          variant = 'secondary' // yellow-ish
-          break
-        case 'inactive':
-          variant = 'destructive' // red
-          break
-        default:
-          variant = 'default'
+      const statusVariant: Record<string, 'default' | 'destructive' | 'secondary'> = {
+        active: 'default',      // green
+        pending: 'secondary',   // yellow-ish
+        inactive: 'destructive' // red
       }
+
+      const variant = statusVariant[row.status.toLowerCase()] ?? 'default'
 
       return (
         <Badge variant={variant} className='capitalize'>
