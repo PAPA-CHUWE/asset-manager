@@ -14,8 +14,10 @@ import UserTable from '@/app/ui-components/UserTable';
 interface Department {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
+  created_at: string;
 }
+
 
 const Departments: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
