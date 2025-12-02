@@ -32,8 +32,8 @@ const Home = () => {
         />
       </div>
       <div className='w-full h-full flex gap-4 justify-between md:flex-row flex-col'>
-        <div className='w-2/3  shadow-md rounded-md p-4 h-[380px]'></div>
-        <div className='w-1/3  shadow-md rounded-md p-4 h-[380px]'></div>
+        <div className='w-2/3  shadow-md rounded-md p-4 h-[380px] ring-1 ring-ring '></div>
+        <div className='w-1/3  shadow-md rounded-md p-4 h-[380px] ring-1 ring-ring'></div>
       </div>
     </div>
   )

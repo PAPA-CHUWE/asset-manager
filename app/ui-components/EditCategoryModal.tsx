@@ -22,11 +22,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import { z } from 'zod';
+import { Category } from '@/app/constants/CategoryCols';
 
-// Zod schema for validation
+// Zod validation
 export const updateCategorySchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  description: z.string().optional()
+  description: z.string().nullable().optional()
 });
 
 type CategoryFormData = z.infer<typeof updateCategorySchema>;
@@ -34,12 +35,8 @@ type CategoryFormData = z.infer<typeof updateCategorySchema>;
 type Props = {
   open: boolean;
   setOpen: (v: boolean) => void;
-  category: {
-    id: string;
-    name: string;
-    description?: string;
-  } | null;
-  onSuccess: (category: any) => void;
+  category: Category | null;
+  onSuccess: (category: Category) => void;
 };
 
 export default function EditCategoryModal({ open, setOpen, category, onSuccess }: Props) {
@@ -51,18 +48,19 @@ export default function EditCategoryModal({ open, setOpen, category, onSuccess }
     }
   });
 
-  // Load category data when modal opens or category changes
+  // Load category values into form
   useEffect(() => {
     if (open && category) {
       form.reset({
         name: category.name || '',
-        description: category.description || ''
+        description: category.description ?? '' // handles null → ''
       });
     }
   }, [open, category, form]);
 
   const onSubmit = async (data: CategoryFormData) => {
     if (!category) return;
+
     const token = sessionStorage.getItem('access_token');
     if (!token) return alert('Not authenticated');
 
@@ -75,13 +73,20 @@ export default function EditCategoryModal({ open, setOpen, category, onSuccess }
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify({
+            ...data,
+            description: data.description === '' ? null : data.description
+          })
         }
       );
-      const result = await res.json();
-      if (!res.ok || !result.success) throw new Error(result.message || 'Update failed');
 
-      onSuccess(result.category); // Update table
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.message || 'Update failed');
+      }
+
+      onSuccess(result.category);
       setOpen(false);
       form.reset();
     } catch (err: any) {
@@ -101,6 +106,7 @@ export default function EditCategoryModal({ open, setOpen, category, onSuccess }
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              
               <FormField
                 name="name"
                 control={form.control}
