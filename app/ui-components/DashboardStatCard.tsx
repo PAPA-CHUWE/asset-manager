@@ -63,7 +63,7 @@ const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
 
       <CardContent className="mt-3 p-0 relative z-10">
         <div className="text-2xl font-bold">{value}</div>
-        {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
+        {description && <p className="text-xs dark:text-muted-foreground text-chart-1 font-semibold tracking-widest mt-1">{description}</p>}
       </CardContent>
     </Card>
   );
