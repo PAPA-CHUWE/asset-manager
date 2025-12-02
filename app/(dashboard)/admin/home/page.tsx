@@ -15,7 +15,7 @@ const Home = () => {
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
           },
         }
       );
