@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { User, Eye, EyeOff } from 'lucide-react'
 import { ModeToggle } from '../theme/ModeTogle'
+import { Switch } from '@/components/ui/switch'
 
 interface SignInFormValues {
   email: string
@@ -62,7 +63,7 @@ export default function SignIn() {
       storage.setItem('role', role)
   
       // Redirect based on role
-      window.location.href = role === 'admin' ? '/admin/home' : '/user/dashboard'
+      window.location.href = role === 'admin' ? '/admin/home' : '/user/home'
     } catch (error: any) {
       console.error('Login error:', error)
       setErrorMessage(error.message)
@@ -85,6 +86,7 @@ export default function SignIn() {
             <User size={50} className="text-slate-700" />
           </div>
         </div>
+
 
         <Form {...form}>
           <form
@@ -181,12 +183,7 @@ export default function SignIn() {
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
 
-            <p className="text-sm mt-4 text-center text-slate-600">
-              Don&apos;t have an account?
-              <span className="text-[#1E2772] font-medium hover:underline ml-1 cursor-pointer">
-                Register here
-              </span>
-            </p>
+           
           </form>
         </Form>
       </div>

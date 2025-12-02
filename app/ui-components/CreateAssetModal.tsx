@@ -89,27 +89,38 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
   // --------------------
   // Submit handler
   // --------------------
-  const onSubmit = async (data: AssetFormData) => {
-    const token = sessionStorage.getItem('access_token');
-    if (!token) return alert('Not authenticated');
 
-    try {
-      const res = await fetch('https://asset-manager-backend-xlkf.onrender.com/admin/assets/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(data)
-      });
-      const result = await res.json();
-      if (!res.ok || !result.success) throw new Error(result.message || 'Failed to create asset');
+const onSubmit = async (data: AssetFormData) => {
+  const token = sessionStorage.getItem('access_token');
+  const role = sessionStorage.getItem('role'); // assuming you store role on login
+  if (!token) return alert('Not authenticated');
+  if (!role) return alert('Role not found');
 
-      onSuccess(result.asset);
-      setOpen(false);
-      form.reset();
-    } catch (err: any) {
-      console.error('Create asset error:', err);
-      alert(err.message || 'Failed to create asset');
-    }
-  };
+  // Decide endpoint based on role
+  const endpoint =
+    role === 'admin'
+      ? 'https://asset-manager-backend-xlkf.onrender.com/admin/assets/create'
+      : 'https://asset-manager-backend-xlkf.onrender.com/user/assets/create';
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    if (!res.ok || !result.success) throw new Error(result.message || 'Failed to create asset');
+
+    onSuccess(result.asset);
+    setOpen(false);
+    form.reset();
+  } catch (err: any) {
+    console.error('Create asset error:', err);
+    alert(err.message || 'Failed to create asset');
+  }
+};
+
 
   // --------------------
   // JSX
@@ -145,7 +156,7 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category *</FormLabel>
-                    <FormControl>
+                    <FormControl className='bg-background text-primary ring-ring ring-1 rounded-md p-1'>
                       <select {...field} className="input">
                         <option value="">Select Category</option>
                         {categories.map((c) => (
@@ -164,7 +175,7 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Department *</FormLabel>
-                    <FormControl>
+                    <FormControl className='bg-background text-primary ring-ring ring-1 rounded-md p-1'>
                       <select {...field} className="input">
                         <option value="">Select Department</option>
                         {departments.map((d) => (

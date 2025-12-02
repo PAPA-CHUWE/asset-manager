@@ -16,7 +16,7 @@ import {
   export const UserMenuItems: MenuItem[] = [
     {
       title: "Dashboard",
-      href: "/user",
+      href: "/user/home",
       icon: <Home size={20} />,
     },
     {
