@@ -17,26 +17,31 @@ import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import { Asset } from '@/app/constants/AssetCols';
 
+// --------------------
+// Zod Schema
+// --------------------
 export const createAssetSchema = z.object({
   name: z.string().min(1, 'Asset name is required'),
   category_id: z.string().min(1, 'Category is required'),
   department_id: z.string().min(1, 'Department is required'),
   date_purchased: z.string().min(1, 'Purchase date is required'),
-  cost: z
-    .string()
-    .transform((val) => Number(val))
-    .refine((val) => !isNaN(val) && val >= 0, 'Cost must be a positive number')
+  cost: z.number().min(0, 'Cost must be positive')
 });
-
 
 type AssetFormData = z.infer<typeof createAssetSchema>;
 
+// --------------------
+// Props
+// --------------------
 interface CreateAssetModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   onSuccess: (asset: Asset) => void;
 }
 
+// --------------------
+// Component
+// --------------------
 const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSuccess }) => {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
@@ -52,6 +57,9 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
     }
   });
 
+  // --------------------
+  // Fetch categories & departments
+  // --------------------
   useEffect(() => {
     if (!open) return;
     const token = sessionStorage.getItem('access_token');
@@ -78,6 +86,9 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
     fetchData();
   }, [open]);
 
+  // --------------------
+  // Submit handler
+  // --------------------
   const onSubmit = async (data: AssetFormData) => {
     const token = sessionStorage.getItem('access_token');
     if (!token) return alert('Not authenticated');
@@ -100,6 +111,9 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
     }
   };
 
+  // --------------------
+  // JSX
+  // --------------------
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-md">
@@ -135,9 +149,7 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
                       <select {...field} className="input">
                         <option value="">Select Category</option>
                         {categories.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.name}
-                          </option>
+                          <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
                       </select>
                     </FormControl>
@@ -156,9 +168,7 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
                       <select {...field} className="input">
                         <option value="">Select Department</option>
                         {departments.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            {d.name}
-                          </option>
+                          <option key={d.id} value={d.id}>{d.name}</option>
                         ))}
                       </select>
                     </FormControl>
@@ -181,6 +191,9 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
                 )}
               />
 
+              {/* ------------------- */}
+              {/* Cost with number fix */}
+              {/* ------------------- */}
               <FormField
                 name="cost"
                 control={form.control}
@@ -188,7 +201,13 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
                   <FormItem>
                     <FormLabel>Cost *</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="Cost" {...field} />
+                      <Input
+                        type="number"
+                        placeholder="Cost"
+                        {...field}
+                        value={field.value ?? ''}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -196,9 +215,7 @@ const CreateAssetModal: React.FC<CreateAssetModalProps> = ({ open, setOpen, onSu
               />
 
               <div className="flex justify-end gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                  Cancel
-                </Button>
+                <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting ? 'Saving...' : 'Save'}
                 </Button>

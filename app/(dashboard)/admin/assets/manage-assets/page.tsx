@@ -33,6 +33,7 @@ export default function ManageAssets() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = await res.json();
+        console.log(data)
         if (data.success && data.assets) setAssets(data.assets);
       } catch (err) {
         console.error(err);

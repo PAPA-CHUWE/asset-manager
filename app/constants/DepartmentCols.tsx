@@ -1,6 +1,7 @@
 // ./app/constants/DepartmentCols.ts
 
-import { Column } from "../ui-components/DepartmentTable";
+import { Column } from "../ui-components/UserTable";
+
 
 export type Department = {
   id: string;

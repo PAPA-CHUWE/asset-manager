@@ -44,7 +44,7 @@ export const AssetCols = (assets: Asset[]): Column<Asset>[] => {
       key: 'cost',
       label: 'Cost',
       render: row => {
-        // Use badge variants like in UserCols
+        
         const variant: 'default' | 'secondary' = row.cost && row.cost > medianCost ? 'secondary' : 'default'
         return (
           <Badge variant={variant}>
