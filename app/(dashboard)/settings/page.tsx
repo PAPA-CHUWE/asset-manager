@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,55 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 
 const Settings = () => {
+  const [profile, setProfile] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("access_token");
+    if (!token) return;
+
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch("https://asset-manager-backend-xlkf.onrender.com/profile/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        if (data.success && data.user) {
+          setProfile({
+            first_name: data.user.first_name || "",
+            last_name: data.user.last_name || "",
+            email: data.user.email || "",
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setProfile((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleUpdateProfile = () => {
+    console.log("Updated profile data:", profile);
+    // TODO: Send PUT/PATCH request to backend to update profile
+  };
+
+  if (loading) return <div className="p-6">Loading profile...</div>;
+
   return (
     <div className="w-full min-h-screen p-6 space-y-6 bg-background">
       {/* Page Header */}
@@ -25,18 +74,34 @@ const Settings = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="firstName">First Name</Label>
-            <Input id="firstName" placeholder="Enter your first name" />
+            <Label htmlFor="first_name">First Name</Label>
+            <Input
+              id="first_name"
+              value={profile.first_name}
+              onChange={handleChange}
+              placeholder="Enter your first name"
+            />
           </div>
           <div>
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input id="lastName" placeholder="Enter your last name" />
+            <Label htmlFor="last_name">Last Name</Label>
+            <Input
+              id="last_name"
+              value={profile.last_name}
+              onChange={handleChange}
+              placeholder="Enter your last name"
+            />
           </div>
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="Enter your email" />
+            <Input
+              id="email"
+              type="email"
+              value={profile.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+            />
           </div>
-          <Button>Update Profile</Button>
+          <Button onClick={handleUpdateProfile}>Update Profile</Button>
         </CardContent>
       </Card>
 
