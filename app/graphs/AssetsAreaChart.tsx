@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -11,7 +11,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTheme } from "next-themes";
 
 interface RecentAsset {
   id: string;
@@ -30,19 +30,17 @@ interface AssetsAreaChartProps {
 
 const AssetsAreaChart: React.FC<AssetsAreaChartProps> = ({ data }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const { theme } = useTheme(); // next-themes hook
 
-  // Extract unique categories
   const categories = Array.from(
     new Set(data.map((d) => d.asset_categories?.name || "Uncategorized"))
   );
 
-  // Filter data by category
   const filteredData =
     selectedCategory === "all"
       ? data
       : data.filter((d) => d.asset_categories?.name === selectedCategory);
 
-  // Sort and map for chart
   const chartData = filteredData
     .slice()
     .sort(
@@ -57,29 +55,12 @@ const AssetsAreaChart: React.FC<AssetsAreaChartProps> = ({ data }) => {
       category: asset.asset_categories?.name || "Uncategorized",
     }));
 
+  const isLight = theme === "light";
+
   return (
     <Card className="h-full">
       <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between">
         <CardTitle>Recent Assets Cost Over Time</CardTitle>
-
-        {/* Category filter */}
-        <Select
-          value={selectedCategory}
-          onValueChange={(val) => setSelectedCategory(val)}
-          className="w-40 mt-2 md:mt-0"
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {categories.map((cat) => (
-              <SelectItem key={cat} value={cat}>
-                {cat}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </CardHeader>
 
       <CardContent className="h-[300px]">
@@ -90,22 +71,34 @@ const AssetsAreaChart: React.FC<AssetsAreaChartProps> = ({ data }) => {
           >
             <defs>
               <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#4ade80" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#4ade80" stopOpacity={0} />
+                <stop
+                  offset="5%"
+                  stopColor={isLight ? "#4ade80" : "#22c55e"}
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor={isLight ? "#4ade80" : "#22c55e"}
+                  stopOpacity={0}
+                />
               </linearGradient>
             </defs>
-            <XAxis dataKey="date" />
-            <YAxis />
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid stroke={isLight ? "oklch(0.129 0.042 264.695)" : "#374151"} strokeDasharray="3 3" />
+            <XAxis dataKey="date" stroke={isLight ? "#374151" : "#d1d5db"} />
+            <YAxis stroke={isLight ? "#374151" : "#d1d5db"} />
             <Tooltip
               formatter={(value: number) => [`$${value}`, "Cost"]}
               labelFormatter={(label: string) => `Date: ${label}`}
-              contentStyle={{ backgroundColor: "#1f2937", borderRadius: 6 }}
+              contentStyle={{
+                backgroundColor: isLight ? "#f9fafb" : "#1f2937",
+                color: isLight ? "#111827" : "#f9fafb",
+                borderRadius: 6,
+              }}
             />
             <Area
               type="monotone"
               dataKey="cost"
-              stroke="#22c55e"
+              stroke={isLight ? "#16a34a" : "#22c55e"}
               fillOpacity={1}
               fill="url(#colorCost)"
             />
@@ -116,4 +109,4 @@ const AssetsAreaChart: React.FC<AssetsAreaChartProps> = ({ data }) => {
   );
 };
 
-export default AssetsAreaChart;
+export default AssetsAreaChart
