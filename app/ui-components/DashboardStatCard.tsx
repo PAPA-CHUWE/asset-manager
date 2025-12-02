@@ -23,7 +23,7 @@ const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
   return (
     <Card
       onClick={onClick}
-      className={`p-4 cursor-pointer hover:shadow-md transition-all ${className}`}
+      className={`p-4 cursor-pointer hover:shadow-lg hover:shadow-card transition-all ${className}`}
     >
       <CardHeader className="flex flex-row items-center justify-between p-0">
         <h4 className="text-sm font-medium text-muted-foreground">{title}</h4>
