@@ -22,8 +22,12 @@ export const createAssetSchema = z.object({
   category_id: z.string().min(1, 'Category is required'),
   department_id: z.string().min(1, 'Department is required'),
   date_purchased: z.string().min(1, 'Purchase date is required'),
-  cost: z.number().min(0, 'Cost must be positive')
+  cost: z
+    .string()
+    .transform((val) => Number(val))
+    .refine((val) => !isNaN(val) && val >= 0, 'Cost must be a positive number')
 });
+
 
 type AssetFormData = z.infer<typeof createAssetSchema>;
 
