@@ -3,10 +3,50 @@
 import React, { useEffect, useState } from "react";
 import DashboardStatCard from "@/app/ui-components/DashboardStatCard";
 import { FolderPlus, Layers, Users } from "lucide-react";
+import AssetsAreaChart from "@/app/graphs/AssetsAreaChart";
 
-const Home = () => {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+interface DepartmentStats {
+  id: string;
+  department_id: string;
+  departments: {
+    name: string;
+  };
+}
+
+interface CategoryStats {
+  id: string;
+  category_id: string;
+  asset_categories: {
+    name: string;
+  };
+}
+
+interface RecentAsset {
+  id: string;
+  name: string;
+  category_id: string;
+  date_purchased: string;
+  cost: number;
+  department_id: string;
+  created_by: string;
+  created_at: string;
+}
+
+interface Stats {
+  total_users: number;
+  active_users: number;
+  inactive_users: number;
+  total_assets: number;
+  total_departments: number;
+  total_categories: number;
+  assets_per_department: DepartmentStats[];
+  assets_per_category: CategoryStats[];
+  recent_assets: RecentAsset[];
+}
+
+const Home: React.FC = () => {
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchStats = async () => {
     try {
@@ -85,11 +125,19 @@ const Home = () => {
       {/* BOTTOM SECTION (Charts, Lists etc.) */}
       <div className="w-full h-full flex gap-4 justify-between md:flex-row flex-col">
         <div className="w-full md:w-2/3 shadow-md rounded-md p-4 h-[380px] ring-1 ring-ring">
-          {/* Chart goes here */}
+        <AssetsAreaChart data={stats.recent_assets} />
         </div>
 
         <div className="w-full md:w-1/3 shadow-md rounded-md p-4 h-[380px] ring-1 ring-ring">
           {/* Recent assets list goes here */}
+          {stats.recent_assets.map((asset) => (
+            <div key={asset.id} className="mb-2 border-b pb-2">
+              <p className="font-medium">{asset.name}</p>
+              <p className="text-sm text-muted-foreground">
+                Cost: ${asset.cost} | Purchased: {asset.date_purchased}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
