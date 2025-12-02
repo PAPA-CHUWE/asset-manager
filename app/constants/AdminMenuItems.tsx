@@ -66,8 +66,8 @@ import {
    
     {
       title: "Settings",
+      href: "/settings",
       icon: <Settings size={20} />,
-      href: "/admin/settings",
     },
   ];
   

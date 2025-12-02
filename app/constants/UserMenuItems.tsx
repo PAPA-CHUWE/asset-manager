@@ -4,6 +4,7 @@ import {
     Archive,
     User,
     HelpCircle,
+    Settings2,
   } from "lucide-react";
   
   export interface MenuItem {
@@ -37,9 +38,9 @@ import {
       icon: <User size={20} />,
     },
     {
-      title: "Help / Support",
-      href: "/user/help",
-      icon: <HelpCircle size={20} />,
+      title: "Settings",
+      href: "/settings",
+      icon: <Settings2 size={20} />,
     },
   ];
   
